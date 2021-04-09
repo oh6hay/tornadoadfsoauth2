@@ -13,7 +13,7 @@ may look a bit odd at places. Cleanup PRs are appreciated.
 First, install by
 
 ```
-pip3 install .
+pip install tornadoadfsoauth2
 ```
 
 Provide the following environment variables (with sample values):
