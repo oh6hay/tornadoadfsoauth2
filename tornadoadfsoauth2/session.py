@@ -2,7 +2,6 @@
 
 import time, json, sys
 import logging
-from db import db
 import base64
 import json
 
