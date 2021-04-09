@@ -6,7 +6,7 @@ import urllib.parse
 import asyncio
 from tornadoadfsoauth2.verify import verify
 from tornadoadfsoauth2.session import sessions
-from tornadoadfsoauth2.log import log
+import logging
 
 import os
 client_id=os.environ.get('adfs_client_id')
@@ -31,7 +31,7 @@ class AdfsMixin(tornado.auth.OAuth2Mixin):
             }
         )
 
-        log("Fetching token from %s"%self._OAUTH_ACCESS_TOKEN_URL)
+        logging.debug("Fetching token from %s"%self._OAUTH_ACCESS_TOKEN_URL)
         response = await http.fetch(
             self._OAUTH_ACCESS_TOKEN_URL,
             method="POST",
@@ -45,7 +45,7 @@ class AuthHandler(tornado.web.RequestHandler,
                   AdfsMixin):
     def on_finish(self):
         ua = (self.request.headers['user-agent'] if 'user-agent' in self.request.headers else 'Unknown').replace('"','')
-        log('%s "%s"'%(str(self._request_summary()), ua))
+        logging.debug('%s "%s"'%(str(self._request_summary()), ua))
     
     def _oauth_consumer_token(self):
         return {'key': client_id,
@@ -54,17 +54,17 @@ class AuthHandler(tornado.web.RequestHandler,
     async def get(self, args):
         self._OAUTH_AUTHORIZE_URL = OAUTH_AUTHORIZE_URL
         self._OAUTH_ACCESS_TOKEN_URL = OAUTH_ACCESS_TOKEN_URL
-        log('GET /auth/')
+        logging.debug('GET /auth/')
         code = self.get_argument('code', None)
         error = self.get_argument('error', None)
         nxt = self.get_argument('next', '/')
         if error:
-            log('/auth error, code="%s", error="%s"'%(str(code), str(error)))
+            logging.debug('/auth error, code="%s", error="%s"'%(str(code), str(error)))
             self.set_status(401)
             self.write(error)
             return
         if not code:
-            log('/auth error, no code present, redirecting to %s'%redirect_uri)
+            logging.debug('/auth error, no code present, redirecting to %s'%redirect_uri)
             self.clear_all_cookies()
             self.authorize_redirect(client_id=client_id,client_secret=sharedsecret, redirect_uri=redirect_uri)
         else:
@@ -79,12 +79,12 @@ class AuthHandler(tornado.web.RequestHandler,
             # verify magic
             decoded = verify(result['access_token'], key, tenant_id)
             if decoded:
-                log('/auth OK')
+                logging.debug('/auth OK')
                 sessions.add_session(result['access_token'], decoded)
                 self.set_secure_cookie('session', result['access_token'])
                 self.redirect(nxt)
             else:
-                log('/auth error, failed to validate token')
+                logging.debug('/auth error, failed to validate token')
                 self.set_status(401)
                 self.write({'status': 'authentication failure'})
 

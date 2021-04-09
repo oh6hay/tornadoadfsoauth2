@@ -4,14 +4,14 @@ import base64, json, time
 import jwt
 from cryptography.x509 import load_pem_x509_certificate
 from cryptography.hazmat.backends import default_backend
-from tornadoadfsoauth2.log import log
+import logging
 
 def verify(t, key, tenant_id):
     parts = t.split('.')
     part0 = json.loads(base64.b64decode(parts[0] + '====='))
-    log('part0:'+str(base64.b64decode(parts[0] + '=====')))
+    logging.debug('part0:'+str(base64.b64decode(parts[0] + '=====')))
     part1 = json.loads(base64.b64decode(parts[1] + '====='))
-    log('part1:'+str(base64.b64decode(parts[1] + '=====')))
+    logging.debug('part1:'+str(base64.b64decode(parts[1] + '=====')))
     sig = parts[2]
 
     nbf = None
@@ -34,20 +34,20 @@ def verify(t, key, tenant_id):
 
     if nbf and exp:
         if decoded != None and nbf < now < exp and decoded['aud'] == tenant_id:
-            log('OK nbf=%d exp=%d'%(nbf,exp))
+            logging.debug('OK nbf=%d exp=%d'%(nbf,exp))
             return decoded
         else:
-            log('NOK nbf=%d exp=%d'%(nbf,exp))
+            logging.debug('NOK nbf=%d exp=%d'%(nbf,exp))
             return None
     elif exp:
         if decoded != None and now < exp and decoded['aud'] == tenant_id:
-            log('OK exp=%d'%exp)
+            logging.debug('OK exp=%d'%exp)
             return decoded
         else:
-            log('NOK exp=%d'%exp)
+            logging.debug('NOK exp=%d'%exp)
             return None
     else:
-        log('verify, nbf and exp missing, decoded="%s"'%str(decoded))
+        logging.debug('verify, nbf and exp missing, decoded="%s"'%str(decoded))
         return decoded if decoded != None and decoded['aud'] == tenant_id else None
         
 if __name__=='__main__':

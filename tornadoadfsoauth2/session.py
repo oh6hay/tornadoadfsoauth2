@@ -2,7 +2,7 @@
 
 import time, json, sys
 from singleton import Singleton
-from log import log
+import logging
 from db import db
 import base64
 import json
@@ -40,12 +40,12 @@ class SessionCache:
         if key in self.sessions:
             s = self.sessions[key]
             if s[0] == sha(key) and s[1] > time.time():
-                log('all is good, session is fine')
+                logging.debug('all is good, session is fine')
                 return True
             else:
-                log('keys match: %s time ok: %s'%(str(s[0] == sha(key)), str(s[1] > time.time())))
+                logging.debug('keys match: %s time ok: %s'%(str(s[0] == sha(key)), str(s[1] > time.time())))
         else:
-            log('fuck off. key not found')
+            logging.debug('fuck off. key not found')
         return False
 
     def get_username(self, key):
