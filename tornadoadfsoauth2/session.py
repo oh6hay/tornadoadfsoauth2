@@ -48,7 +48,7 @@ class SessionCache:
 
     def get_username(self, key):
         try:
-            exp, iat, nbf, upn, winaccountname = db.get_session(key)
+            shakey, exp, iat, nbf, upn, winaccountname = self.sessions[key]
             return winaccountname
         except:
             return None
