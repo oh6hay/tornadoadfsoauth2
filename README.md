@@ -3,6 +3,11 @@
 This module provides an ADFS-Oauth2 authentication mixin to a web
 application built on the Tornadoweb framework.
 
+# Known issues
+
+This project was quickly extracted from some other project. The code
+may look a bit odd at places. Cleanup PRs are appreciated.
+
 # Setup
 
 First, install by
