@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import time, json, sys
-from singleton import Singleton
 import logging
 from db import db
 import base64
